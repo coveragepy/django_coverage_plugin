@@ -97,10 +97,8 @@ extensions if you like::
     [django_coverage_plugin]
     template_extensions = html, txt, tex, email
 
-To exclude specific individual lines in a template, use the usual
-``# pragma: no cover`` notation inline. Template tags can also be excluded using regexes to 
-match the block content; for example, to exclude a custom template tag
-``{% my_tag ... %}``, use::
+Block tags can be excluded using regexes to match the block content;
+for example, to exclude a custom template tag ``{% my_tag ... %}``, use::
 
     [run]
     plugins = django_coverage_plugin
