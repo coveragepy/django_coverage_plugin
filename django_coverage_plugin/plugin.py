@@ -10,6 +10,7 @@ import coverage.plugin
 import django
 import django.template
 from coverage.exceptions import NoSource
+from coverage.misc import join_regex
 from django.template.base import Lexer, NodeList, Template, TextNode, TokenType
 from django.template.defaulttags import VerbatimNode
 from django.templatetags.i18n import BlockTranslateNode
@@ -117,6 +118,8 @@ class DjangoTemplatePlugin(
         extensions = options.get("template_extensions", "html,htm,txt")
         self.extensions = [e.strip() for e in extensions.split(",")]
 
+        self.exclude_blocks = options.get("exclude_blocks")
+
         self.debug_checked = False
 
         self.django_template_dir = os.path.normcase(os.path.realpath(
@@ -151,7 +154,7 @@ class DjangoTemplatePlugin(
         return None
 
     def file_reporter(self, filename):
-        return FileReporter(filename)
+        return FileReporter(filename, self.exclude_blocks)
 
     def find_executable_files(self, src_dir):
         # We're only interested in files that look like reasonable HTML
@@ -259,9 +262,15 @@ class DjangoTemplatePlugin(
 
 
 class FileReporter(coverage.plugin.FileReporter):
-    def __init__(self, filename):
+    def __init__(self, filename, exclude_blocks):
         super().__init__(filename)
         # TODO: html filenames are absolute.
+
+        if exclude_blocks:
+            self.exclude_blocks_regex = re.compile(join_regex(exclude_blocks))
+        else:
+            self.exclude_blocks_regex = None
+        self._excluded = set()
 
         self._source = None
 
@@ -319,6 +328,12 @@ class FileReporter(coverage.plugin.FileReporter):
                     # blocks.
                     continue
 
+                # Ignore any block token content that has been explcitly
+                # excluded in config
+                if self.exclude_block_token(token):
+                    self._excluded.add(token.lineno)
+                    continue
+
                 if token.contents == "comment":
                     comment = True
                 if token.contents.startswith("end"):
@@ -355,6 +370,13 @@ class FileReporter(coverage.plugin.FileReporter):
                 print(f"\t\t\tNow source_lines is: {source_lines!r}")
 
         return source_lines
+
+    def excluded_lines(self):
+        return self._excluded
+
+    def exclude_block_token(self, token):
+        if self.exclude_blocks_regex:
+            return self.exclude_blocks_regex.search(token.contents)
 
 
 def running_sum(seq):

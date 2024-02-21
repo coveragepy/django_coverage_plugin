@@ -264,3 +264,30 @@ class BranchTest(DjangoPluginTestCase):
             )
         self.assertEqual(text, 'Hello\nWorld\n\nGoodbye')
         self.assert_analysis([1, 2, 3, 4])
+
+
+class ExcludeTest(DjangoPluginTestCase):
+    """Tests of excluding block tokens by regex."""
+
+    def test_exclude_block(self):
+        self.make_template("""\
+            First
+            {% with foo='bar' %}
+                {{ foo }}
+            {% endwith %}
+            Last
+            """)
+        text = self.run_django_coverage()
+        self.assertEqual(text, "First\n\n    bar\n\nLast\n")
+        self.assert_analysis([1, 2, 3, 5])
+
+        self.make_file(".coveragerc", """\
+            [run]
+            plugins = django_coverage_plugin
+            [django_coverage_plugin]
+            exclude_blocks = [".+foo.+"]
+            """)
+
+        text = self.run_django_coverage()
+        self.assertEqual(text, "First\n\n    bar\n\nLast\n")
+        self.assert_analysis([1, 3, 5])
