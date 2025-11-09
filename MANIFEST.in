@@ -1,6 +1,6 @@
 # Licensed under the Apache 2.0 License
 # - http://www.apache.org/licenses/LICENSE-2.0
-# - https://github.com/nedbat/django_coverage_plugin/blob/master/NOTICE.txt
+# - https://github.com/coveragepy/django_coverage_plugin/blob/main/NOTICE.txt
 
 include *.txt
 include .editorconfig
