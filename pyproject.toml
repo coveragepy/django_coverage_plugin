@@ -40,9 +40,9 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-"Homepage" = "https://github.com/nedbat/django_coverage_plugin"
-"Bug Tracker" = "https://github.com/nedbat/django_coverage_plugin/issues"
-"Source" = "https://github.com/nedbat/django_coverage_plugin"
+"Homepage" = "https://github.com/coveragepy/django_coverage_plugin"
+"Bug Tracker" = "https://github.com/coveragepy/django_coverage_plugin/issues"
+"Source" = "https://github.com/coveragepy/django_coverage_plugin"
 
 [tool.setuptools.dynamic]
 version = {attr = "django_coverage_plugin.__version__"}

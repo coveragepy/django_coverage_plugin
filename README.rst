@@ -191,7 +191,7 @@ ignore_errors=True`` (`issue 78`_).
 When using ``source=.``, an existing coverage HTML report directory would be
 found and believed to be unmeasured HTML template files.  This is now fixed.
 
-.. _issue 78: https://github.com/nedbat/django_coverage_plugin/issues/78
+.. _issue 78: https://github.com/coveragepy/django_coverage_plugin/issues/78
 
 
 v2.0.1 — 2021-10-06
@@ -214,9 +214,9 @@ case-sensitively, causing templates to be missed (`issue 46`_).
 Fix an issue (`issue 63`_) where tag libraries can't be found if imported
 during test collection. Thanks to Daniel Izquierdo for the fix.
 
-.. _issue 46: https://github.com/nedbat/django_coverage_plugin/issues/46
-.. _issue 60: https://github.com/nedbat/django_coverage_plugin/issues/60
-.. _issue 63: https://github.com/nedbat/django_coverage_plugin/issues/63
+.. _issue 46: https://github.com/coveragepy/django_coverage_plugin/issues/46
+.. _issue 60: https://github.com/coveragepy/django_coverage_plugin/issues/60
+.. _issue 63: https://github.com/coveragepy/django_coverage_plugin/issues/63
 
 v1.8.0 — 2020-01-23
 -------------------
@@ -266,7 +266,7 @@ v1.4.2 — 2017-02-06
 Fixes another instance of `issue 32`_, which was the result of an
 initialization order problem.
 
-.. _issue 32: https://github.com/nedbat/django_coverage_plugin/issues/32
+.. _issue 32: https://github.com/coveragepy/django_coverage_plugin/issues/32
 
 
 v1.4.1 — 2017-01-25
@@ -288,8 +288,8 @@ Only the ``django.template.backends.django.DjangoTemplates`` template
 engine is supported, and it must be configured with
 ``['OPTIONS']['debug'] = True``. Fixes `issue 27`_.
 
-.. _issue 28: https://github.com/nedbat/django_coverage_plugin/issues/28
-.. _issue 27: https://github.com/nedbat/django_coverage_plugin/issues/27
+.. _issue 28: https://github.com/coveragepy/django_coverage_plugin/issues/28
+.. _issue 27: https://github.com/coveragepy/django_coverage_plugin/issues/27
 
 
 
@@ -299,7 +299,7 @@ v1.3.1 — 2016-06-02
 Settings are read slightly differently, so as to not interfere with
 programs that don't need settings.  Fixes `issue 18`_.
 
-.. _issue 18: https://github.com/nedbat/django_coverage_plugin/issues/18
+.. _issue 18: https://github.com/coveragepy/django_coverage_plugin/issues/18
 
 
 
@@ -335,7 +335,7 @@ plugin, and fixes `issue 17`_.
 Potential Django 1.9 support is included, but the patch to Django hasn't
 been applied yet.
 
-.. _issue 17: https://github.com/nedbat/django_coverage_plugin/issues/17
+.. _issue 17: https://github.com/coveragepy/django_coverage_plugin/issues/17
 
 
 
