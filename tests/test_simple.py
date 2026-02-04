@@ -238,6 +238,70 @@ class OtherTest(DjangoPluginTestCase):
         self.assertEqual(text, "\nalpha = 1, beta = 2.\n\n")
         self.assert_analysis([1, 2])
 
+    def test_script_tag_ignored(self):
+        self.make_file(".coveragerc", """\
+            [run]
+            plugins = django_coverage_plugin
+            [django_coverage_plugin]
+            ignore_script_tags = true
+            """)
+
+        template = """{% if 1 %}
+        {% url 'xxx' as yyy %}
+        <div class="x"
+             id="y"
+             {% if qux %}data-element="true"{% endif %}>
+            xxx
+
+        </div>
+        <script>
+         this should be a JS error.
+         and these lines should not be covered.
+
+
+        </script>
+        {% endif %}
+        <div>
+          yyy
+        </div>"""
+        self.make_template(template)
+        self.run_django_coverage()
+        report = self.cov.report()
+        lines = len(template.split('\n'))
+        self.assertEqual(report, 100.0 * (lines - 2) / lines)
+
+    def test_script_tag_not_ignored(self):
+        self.make_file(".coveragerc", """\
+            [run]
+            plugins = django_coverage_plugin
+            [django_coverage_plugin]
+            ignore_script_tags = false
+            """)
+
+        template = """{% if 1 %}
+        {% url 'xxx' as yyy %}
+        <div class="x"
+             id="y"
+             {% if qux %}data-element="true"{% endif %}>
+            xxx
+
+        </div>
+        <script>
+         this should be a JS error.
+         and these lines should not be covered.
+
+
+        </script>
+        {% endif %}
+        <div>
+          yyy
+        </div>"""
+        self.make_template(template)
+        self.run_django_coverage()
+        report = self.cov.report()
+        lines = len(template.split('\n'))
+        self.assertEqual(report, 100.0)
+
 
 class StringTemplateTest(DjangoPluginTestCase):
 

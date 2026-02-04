@@ -5,6 +5,7 @@
 
 import os.path
 import re
+import html.parser
 
 import coverage.plugin
 import django
@@ -125,6 +126,8 @@ class DjangoTemplatePlugin(
 
         self.source_map = {}
 
+        self.ignore_script_tags = options.get('ignore_script_tags', False) in (True, 'True', 'true')
+
     # --- CoveragePlugin methods
 
     def sys_info(self):
@@ -151,7 +154,7 @@ class DjangoTemplatePlugin(
         return None
 
     def file_reporter(self, filename):
-        return FileReporter(filename)
+        return FileReporter(filename, ignore_script_tags=self.ignore_script_tags)
 
     def find_executable_files(self, src_dir):
         # We're only interested in files that look like reasonable HTML
@@ -258,12 +261,48 @@ class DjangoTemplatePlugin(
         return self.source_map[filename]
 
 
+class ScriptParser(html.parser.HTMLParser):
+    # We never have nested script tags, so we are all good.
+
+    def __init__(self, *args, **kwargs):
+        self.script_checker = kwargs.pop('script_checker', lambda attrs: True)
+        super().__init__(*args, **kwargs)
+        self.script_blocks = []
+        self.in_script = False
+        self.script_lines_cache = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'script':
+            attrs = dict(attrs)
+            self.in_script = self.script_checker(attrs) and attrs.get('type', 'text/javascript') == 'text/javascript'
+
+    def handle_endtag(self, tag):
+        if tag == 'script':
+            self.in_script = False
+
+    def handle_data(self, data):
+        if self.in_script:
+            start_line = self.getpos()[0]
+            self.script_blocks.append((start_line + 1, start_line + 1 + data.rstrip().count('\n')))
+
+    def _script_lines(self):
+        for block in self.script_blocks:
+            yield from range(block[0], block[1])
+
+    @property
+    def script_lines(self):
+        if self.script_lines_cache is None:
+            self.script_lines_cache = list(self._script_lines())
+        return self.script_lines_cache
+
+
 class FileReporter(coverage.plugin.FileReporter):
-    def __init__(self, filename):
+    def __init__(self, filename, *, ignore_script_tags=False):
         super().__init__(filename)
         # TODO: html filenames are absolute.
 
         self._source = None
+        self.ignore_script_tags = ignore_script_tags
 
     def source(self):
         if self._source is None:
@@ -272,6 +311,16 @@ class FileReporter(coverage.plugin.FileReporter):
             except (OSError, UnicodeError) as exc:
                 raise NoSource(f"Couldn't read {self.filename}: {exc}")
         return self._source
+
+    def translate_lines(self, lines):
+        if self.ignore_script_tags:
+            # Initially, we'll only support "simple" script contents, ie,
+            # they may not have any django template directives within them.
+            parser = ScriptParser()
+            parser.feed(self.source())
+            return {line for line in lines if line not in parser.script_lines}
+
+        return super().translate_lines(lines)
 
     def lines(self):
         source_lines = set()

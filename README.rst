@@ -107,6 +107,18 @@ If you use ``pyproject.toml`` for tool configuration use::
     [tool.coverage.django_coverage_plugin]
     template_extensions = 'html, txt, tex, email'
 
+By default, <script> tags will be marked as covered if they were rendered. If you are collecting
+in-browser coverage data, you can instruct the plugin not to count the content of the script tags
+as covered::
+
+    [run]
+    plugins = django_coverage_plugin
+
+    [django_coverage_plugin]
+    ignore_script_tags = true
+
+
+
 Caveats
 ~~~~~~~
 
