@@ -120,6 +120,8 @@ class DjangoTemplatePlugin(
 
         self.exclude_blocks = options.get("exclude_blocks")
 
+        self.exclude_blocks = options.get("exclude_blocks")
+
         self.debug_checked = False
 
         self.django_template_dir = os.path.normcase(os.path.realpath(
@@ -334,6 +336,12 @@ class FileReporter(coverage.plugin.FileReporter):
                     self._excluded.add(token.lineno)
                     continue
 
+                # Ignore any block token content that has been explcitly
+                # excluded in config
+                if self.exclude_block_token(token):
+                    self._excluded.add(token.lineno)
+                    continue
+
                 if token.contents == "comment":
                     comment = True
                 if token.contents.startswith("end"):
@@ -371,13 +379,17 @@ class FileReporter(coverage.plugin.FileReporter):
 
         return source_lines
 
+
     def excluded_lines(self):
         return self._excluded
 
     def exclude_block_token(self, token):
         if self.exclude_blocks_regex:
             return self.exclude_blocks_regex.search(token.contents)
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 
 def running_sum(seq):
     total = 0
