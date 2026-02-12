@@ -1,7 +1,9 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
-# For details: https://github.com/nedbat/django_coverage_plugin/blob/master/NOTICE.txt
+# For details: https://github.com/coveragepy/django_coverage_plugin/blob/main/NOTICE.txt
 
 # Makefile for django_coverage_plugin
+
+.PHONY: help test clean sterile dist pypi test_pypi tag ghrelease
 
 help:					## Show this help.
 	@echo "Available targets:"
@@ -24,15 +26,22 @@ clean:					## Remove non-source files.
 sterile: clean                          ## Remove all non-controlled content, even if expensive.
 	-rm -rf .tox*
 
-kit:					## Make the source distribution.
+dist:					## Make the source distribution.
 	python -m build
 	python -m twine check dist/*
 
-kit_upload:				## Upload the built distributions to PyPI.
+pypi:					## Upload the built distributions to PyPI.
 	python -m twine upload --verbose dist/*
 
-tag:					## Make a git tag with the version number.
-	git tag -s -m "Version v$$(python setup.py --version)" v$$(python setup.py --version)
+test_pypi:				## Upload the distributions to test PyPI.
+	python -m twine upload --verbose --repository testpypi --password $$TWINE_TEST_PASSWORD dist/*
+
+_install_e:
+	python -m pip install -q -e .
+
+tag: _install_e				## Make a git tag with the version number.
+	@export VER="$$(python -c "import django_coverage_plugin as me; print(me.__version__)")" && \
+	git tag -s -m "Version v$$VER" v$$VER
 	git push --all
 
 ghrelease:				## Make a GitHub release for the latest version.

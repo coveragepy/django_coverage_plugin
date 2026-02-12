@@ -4,10 +4,9 @@ Django Template Coverage.py Plugin
 
 A `coverage.py`_ plugin to measure test coverage of Django templates.
 
-.. start-badges
-
 | |status| |kit| |license|
 | |versions| |djversions|
+| |sponsor| |bluesky-nedbat| |mastodon-nedbat|
 
 .. |status| image:: https://img.shields.io/pypi/status/django_coverage_plugin.svg
     :target: https://pypi.python.org/pypi/django_coverage_plugin
@@ -21,23 +20,31 @@ A `coverage.py`_ plugin to measure test coverage of Django templates.
 .. |versions| image:: https://img.shields.io/pypi/pyversions/django_coverage_plugin.svg
     :target: https://pypi.python.org/pypi/django_coverage_plugin
     :alt: Supported Python Versions
-.. |djversions| image:: https://img.shields.io/badge/Django-1.8%20%7C%201.11%20%7C%202.2%20%7C%203.2%20%7C%204.1-44b78b.svg
+.. the Django badge says: `3.2 | 4.2 | 5.2`
+.. |djversions| image:: https://img.shields.io/badge/Django-3.2%20%7C%204.2%20%7C%205.2-44b78b.svg
     :target: https://pypi.python.org/pypi/django_coverage_plugin
     :alt: Supported Django Versions
+.. |sponsor| image:: https://img.shields.io/badge/%E2%9D%A4-Sponsor%20me-brightgreen?style=flat&logo=GitHub
+    :target: https://github.com/sponsors/nedbat
+    :alt: Sponsor me on GitHub
+.. |bluesky-nedbat| image:: https://img.shields.io/badge/dynamic/json?style=flat&color=96a3b0&labelColor=3686f7&logo=icloud&logoColor=white&label=@nedbat&url=https%3A%2F%2Fpublic.api.bsky.app%2Fxrpc%2Fapp.bsky.actor.getProfile%3Factor=nedbat.com&query=followersCount
+    :target: https://bsky.app/profile/nedbat.com
+    :alt: nedbat on Bluesky
+.. |mastodon-nedbat| image:: https://img.shields.io/badge/dynamic/json?style=flat&labelColor=450657&logo=mastodon&logoColor=ffffff&label=@nedbat&query=followers_count&url=https%3A%2F%2Fhachyderm.io%2Fapi%2Fv1%2Faccounts%2Flookup%3Facct=nedbat
+    :target: https://hachyderm.io/@nedbat
+    :alt: nedbat on Mastodon
 
-------------------
 
-.. end-badges
 
 Supported on:
 
-- Python: 3.8 through 3.12.
+- Python: 3.10 through 3.14.
 
-- Django: 2.x, 3.x and 4.x.
+- Django: 3.2 through 5.2.
 
 - Coverage.py: 6.x or higher.
 
-The plugin is pip installable::
+The plugin is pip-installable::
 
     $ python3 -m pip install django_coverage_plugin
 
@@ -49,8 +56,7 @@ To run it, add this setting to your ``.coveragerc`` file::
 Then run your tests under `coverage.py`_.
 
 You will see your templates listed in your coverage report along with
-your Python modules. Please use `coverage.py`_ v4.4 or greater to allow
-the plugin to identify untested templates.
+your Python modules.
 
 If you get a :code:`django.core.exceptions.ImproperlyConfigured` error,
 you need to set the :code:`DJANGO_SETTINGS_MODULE` environment variable.
@@ -137,6 +143,18 @@ History
 
 .. scriv-insert-here
 
+v3.2.0 — 2025-10-05
+-------------------
+
+Drop Python 3.9 and Django 2.2. Add Python 3.14.
+
+
+v3.1.1 — 2025-06-15
+-------------------
+
+Support changes: dropped Python 3.8, added Python 3.13.  Added Django 5.2.
+
+
 v3.1.0 — 2023-07-10
 -------------------
 
@@ -173,7 +191,7 @@ ignore_errors=True`` (`issue 78`_).
 When using ``source=.``, an existing coverage HTML report directory would be
 found and believed to be unmeasured HTML template files.  This is now fixed.
 
-.. _issue 78: https://github.com/nedbat/django_coverage_plugin/issues/78
+.. _issue 78: https://github.com/coveragepy/django_coverage_plugin/issues/78
 
 
 v2.0.1 — 2021-10-06
@@ -196,9 +214,9 @@ case-sensitively, causing templates to be missed (`issue 46`_).
 Fix an issue (`issue 63`_) where tag libraries can't be found if imported
 during test collection. Thanks to Daniel Izquierdo for the fix.
 
-.. _issue 46: https://github.com/nedbat/django_coverage_plugin/issues/46
-.. _issue 60: https://github.com/nedbat/django_coverage_plugin/issues/60
-.. _issue 63: https://github.com/nedbat/django_coverage_plugin/issues/63
+.. _issue 46: https://github.com/coveragepy/django_coverage_plugin/issues/46
+.. _issue 60: https://github.com/coveragepy/django_coverage_plugin/issues/60
+.. _issue 63: https://github.com/coveragepy/django_coverage_plugin/issues/63
 
 v1.8.0 — 2020-01-23
 -------------------
@@ -248,7 +266,7 @@ v1.4.2 — 2017-02-06
 Fixes another instance of `issue 32`_, which was the result of an
 initialization order problem.
 
-.. _issue 32: https://github.com/nedbat/django_coverage_plugin/issues/32
+.. _issue 32: https://github.com/coveragepy/django_coverage_plugin/issues/32
 
 
 v1.4.1 — 2017-01-25
@@ -270,8 +288,8 @@ Only the ``django.template.backends.django.DjangoTemplates`` template
 engine is supported, and it must be configured with
 ``['OPTIONS']['debug'] = True``. Fixes `issue 27`_.
 
-.. _issue 28: https://github.com/nedbat/django_coverage_plugin/issues/28
-.. _issue 27: https://github.com/nedbat/django_coverage_plugin/issues/27
+.. _issue 28: https://github.com/coveragepy/django_coverage_plugin/issues/28
+.. _issue 27: https://github.com/coveragepy/django_coverage_plugin/issues/27
 
 
 
@@ -281,7 +299,7 @@ v1.3.1 — 2016-06-02
 Settings are read slightly differently, so as to not interfere with
 programs that don't need settings.  Fixes `issue 18`_.
 
-.. _issue 18: https://github.com/nedbat/django_coverage_plugin/issues/18
+.. _issue 18: https://github.com/coveragepy/django_coverage_plugin/issues/18
 
 
 
@@ -317,7 +335,7 @@ plugin, and fixes `issue 17`_.
 Potential Django 1.9 support is included, but the patch to Django hasn't
 been applied yet.
 
-.. _issue 17: https://github.com/nedbat/django_coverage_plugin/issues/17
+.. _issue 17: https://github.com/coveragepy/django_coverage_plugin/issues/17
 
 
 

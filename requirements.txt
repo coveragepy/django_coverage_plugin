@@ -1,5 +1,7 @@
-# To run tests, we just need tox.
-tox >= 1.8
+# To run tests, we just need tox:
+tox
+
+# For releases:
 build
 scriv
 twine

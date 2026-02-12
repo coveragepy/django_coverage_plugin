@@ -1,7 +1,7 @@
 * Release checklist
 
-- Version number in setup.py
-- Classifiers in setup.py
+- Version number in __init__.py
+- Classifiers in pyproject.toml
     https://pypi.python.org/pypi?%3Aaction=list_classifiers
     eg:
       Development Status :: 3 - Alpha
@@ -9,7 +9,8 @@
 - Copyright date in NOTICE.txt
 - Update README.rst with latest changes
 - Kits:
-    $ make clean kit
-    $ make kit_upload
+    $ make clean dist
+    $ make test_pypi
+    $ make pypi
     $ make tag
     $ make ghrelease

@@ -1,15 +1,12 @@
 # Licensed under the Apache 2.0 License
 # - http://www.apache.org/licenses/LICENSE-2.0
-# - https://github.com/nedbat/django_coverage_plugin/blob/master/NOTICE.txt
+# - https://github.com/coveragepy/django_coverage_plugin/blob/main/NOTICE.txt
 
-exclude .isort.cfg
-exclude howto.txt
-exclude Makefile
-exclude requirements.txt
-exclude tox.ini
-exclude .editorconfig
-include AUTHORS.txt
-include LICENSE.txt
-include NOTICE.txt
-include README.rst
-prune tests
+include *.txt
+include .editorconfig
+include .isort.cfg
+include Makefile
+include tox.ini
+
+recursive-include .github *
+recursive-include tests *.py

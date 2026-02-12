@@ -1,0 +1,65 @@
+# Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
+# For details: https://github.com/coveragepy/django_coverage_plugin/blob/main/NOTICE.txt
+
+[build-system]
+requires = ["setuptools>=77.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django_coverage_plugin"
+description = "Django template coverage.py plugin"
+readme = "README.rst"
+authors = [
+    {name = "Ned Batchelder", email = "ned@nedbatchelder.com"},
+]
+license = "Apache-2.0"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+]
+requires-python = ">= 3.10"
+dependencies = [
+    "coverage",
+    "Django",
+]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/coveragepy/django_coverage_plugin"
+"Bug Tracker" = "https://github.com/coveragepy/django_coverage_plugin/issues"
+"Source" = "https://github.com/coveragepy/django_coverage_plugin"
+
+[tool.setuptools.dynamic]
+version = {attr = "django_coverage_plugin.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["django_coverage_plugin*"]
+
+[tool.pytest.ini_options]
+# How come these warnings are suppressed successfully here, but not in conftest.py??
+filterwarnings = [
+    # ignore all DeprecationWarnings...
+    "ignore::DeprecationWarning",
+    # ...but show them if they are from our code.
+    "default::DeprecationWarning:django_coverage_plugin",
+]
+
+[tool.scriv]
+fragment_directory = "scriv.d"
+output_file = "README.rst"
+rst_header_chars = "-."

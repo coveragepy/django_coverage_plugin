@@ -1,5 +1,5 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
-# For details: https://github.com/nedbat/django_coverage_plugin/blob/master/NOTICE.txt
+# For details: https://github.com/coveragepy/django_coverage_plugin/blob/main/NOTICE.txt
 
 """Simple tests for django_coverage_plugin."""
 
@@ -287,7 +287,7 @@ class ExcludeTest(DjangoPluginTestCase):
             [django_coverage_plugin]
             exclude_blocks = [".+foo.+"]
             """)
-        
+
         text = self.run_django_coverage()
         self.assertEqual(text, "First\n\n    bar\n\nLast\n")
         self.assert_analysis([1, 3, 5])

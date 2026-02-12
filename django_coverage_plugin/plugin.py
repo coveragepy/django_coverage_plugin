@@ -1,47 +1,19 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
-# For details: https://github.com/nedbat/django_coverage_plugin/blob/master/NOTICE.txt
+# For details: https://github.com/coveragepy/django_coverage_plugin/blob/main/NOTICE.txt
 
 """The Django template coverage plugin."""
 
 import os.path
 import re
 
-from coverage.misc import join_regex
-
-try:
-    from coverage.exceptions import NoSource
-except ImportError:
-    # for coverage 5.x
-    from coverage.misc import NoSource
 import coverage.plugin
 import django
 import django.template
-from django.template.base import Lexer, NodeList, Template, TextNode
+from coverage.exceptions import NoSource
+from coverage.misc import join_regex
+from django.template.base import Lexer, NodeList, Template, TextNode, TokenType
 from django.template.defaulttags import VerbatimNode
 from django.templatetags.i18n import BlockTranslateNode
-
-try:
-    from django.template.base import TokenType
-
-    def _token_name(token_type):
-        token_type.name.capitalize()
-
-except ImportError:
-    # Django <2.1 uses separate constants for token types
-    from django.template.base import (
-        TOKEN_BLOCK,
-        TOKEN_MAPPING,
-        TOKEN_TEXT,
-        TOKEN_VAR,
-    )
-
-    class TokenType:
-        TEXT = TOKEN_TEXT
-        VAR = TOKEN_VAR
-        BLOCK = TOKEN_BLOCK
-
-    def _token_name(token_type):
-        return TOKEN_MAPPING[token_type]
 
 
 class DjangoTemplatePluginException(Exception):
@@ -98,8 +70,8 @@ def check_debug():
     return True
 
 
-if django.VERSION < (2, 0):
-    raise RuntimeError("Django Coverage Plugin requires Django 2.x or higher")
+if django.VERSION < (3, 0):
+    raise RuntimeError("Django Coverage Plugin requires Django 3.x or higher")
 
 
 # Since we are grabbing at internal details, we have to adapt as they
@@ -131,14 +103,8 @@ def read_template_source(filename):
     if not settings.configured:
         settings.configure()
 
-    with open(filename, "rb") as f:
-        # The FILE_CHARSET setting will be removed in 3.1:
-        # https://docs.djangoproject.com/en/3.0/ref/settings/#file-charset
-        if django.VERSION >= (3, 1):
-            charset = 'utf-8'
-        else:
-            charset = settings.FILE_CHARSET
-        text = f.read().decode(charset)
+    with open(filename, "r", encoding="utf-8") as f:
+        text = f.read()
 
     return text
 
@@ -151,7 +117,9 @@ class DjangoTemplatePlugin(
     def __init__(self, options):
         extensions = options.get("template_extensions", "html,htm,txt")
         self.extensions = [e.strip() for e in extensions.split(",")]
-        
+
+        self.exclude_blocks = options.get("exclude_blocks")
+
         self.exclude_blocks = options.get("exclude_blocks")
 
         self.debug_checked = False
@@ -336,7 +304,7 @@ class FileReporter(coverage.plugin.FileReporter):
             if SHOW_PARSING:
                 print(
                     "%10s %2d: %r" % (
-                        _token_name(token.token_type),
+                        token.token_type.capitalize(),
                         token.lineno,
                         token.contents,
                     )
@@ -361,7 +329,13 @@ class FileReporter(coverage.plugin.FileReporter):
                     # In an inheriting template, ignore all tags outside of
                     # blocks.
                     continue
-                
+
+                # Ignore any block token content that has been explcitly
+                # excluded in config
+                if self.exclude_block_token(token):
+                    self._excluded.add(token.lineno)
+                    continue
+
                 # Ignore any block token content that has been explcitly
                 # excluded in config
                 if self.exclude_block_token(token):
@@ -411,6 +385,7 @@ class FileReporter(coverage.plugin.FileReporter):
     def exclude_block_token(self, token):
         if self.exclude_blocks_regex:
             return self.exclude_blocks_regex.search(token.contents)
+
 
 def running_sum(seq):
     total = 0
