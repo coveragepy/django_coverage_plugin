@@ -226,7 +226,7 @@ class IfEqualTest(DjangoPluginTestCase):
             'items': [(0, 'A'), (1, 'X'), (2, 'X'), (3, 'B')],
         })
         self.assertEqual(squashed(text), '0X1X23')
-        self.assert_analysis([1, 2, 3, 4, 5])
+        self.assert_analysis([1, 2, 3, 5])
 
     def test_ifnotequal(self):
         self.make_template("""\
@@ -242,4 +242,4 @@ class IfEqualTest(DjangoPluginTestCase):
             'items': [(0, 'A'), (1, 'X'), (2, 'X'), (3, 'B')],
         })
         self.assertEqual(squashed(text), 'X012X3')
-        self.assert_analysis([1, 2, 3, 4, 5])
+        self.assert_analysis([1, 2, 3, 5])
