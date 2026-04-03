@@ -42,7 +42,7 @@ Supported on:
 
 - Django: 5.2 through 6.0.
 
-- Coverage.py: 7.x or higher.
+- Coverage.py: 6.x or higher.
 
 The plugin is pip-installable::
 
