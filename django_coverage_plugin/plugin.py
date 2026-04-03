@@ -349,10 +349,10 @@ class FileReporter(coverage.plugin.FileReporter):
                 if lines[0].isspace():
                     lineno += 1
                     num_lines -= 1
-                # When {% endblock %} is not at the start of a line, the
-                # preceding TEXT token ends with whitespace and no newline.
+                # When a tag is not at the start of a line, the preceding
+                # TEXT token ends with whitespace and no newline.
                 # That partial line is not executable content.
-                if inblock and num_lines > 0 and (
+                if num_lines > 0 and (
                     lines[-1].isspace() and not lines[-1].endswith(("\n", "\r"))
                 ):
                     num_lines -= 1

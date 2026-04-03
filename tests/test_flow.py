@@ -25,6 +25,31 @@ class IfTest(DjangoPluginTestCase):
         self.assertEqual(text.strip(), '')
         self.assert_analysis([1, 2], [2])
 
+    def test_endif_not_at_start_of_line(self):
+        self.make_template("""\
+            <article>
+              {% if foo %}
+                Hello
+              {% endif %}
+              After
+            </article>
+            """)
+        self.run_django_coverage(context={'foo': False})
+        self.assert_analysis([1, 2, 3, 5, 6], missing=[3])
+
+    def test_else_not_at_start_of_line(self):
+        self.make_template("""\
+            <article>
+              {% if foo %}
+                Hello
+              {% else %}
+                Goodbye
+              {% endif %}
+            </article>
+            """)
+        self.run_django_coverage(context={'foo': True})
+        self.assert_analysis([1, 2, 3, 5, 7], missing=[5])
+
     def test_if_else(self):
         self.make_template("""\
             {% if foo %}
@@ -84,6 +109,17 @@ class LoopTest(DjangoPluginTestCase):
         self.assertEqual(text, "Before\n\nAfter\n")
         self.assert_analysis([1, 2, 3, 5], [3])
 
+    def test_endfor_not_at_start_of_line(self):
+        self.make_template("""\
+            <ul>
+              {% for item in items %}
+                <li>{{ item }}</li>
+              {% endfor %}
+            </ul>
+            """)
+        self.run_django_coverage(context={'items': []})
+        self.assert_analysis([1, 2, 3, 5], missing=[3])
+
     def test_loop_with_empty_clause(self):
         self.make_template("""\
             Before
@@ -135,7 +171,7 @@ class LoopTest(DjangoPluginTestCase):
                 <ul><li>New York: 20</li><li>Chicago: 7</li></ul></li><li>Japan
                 <ul><li>Tokyo: 33</li></ul></li></ul>
             """))
-        self.assert_analysis([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13])
+        self.assert_analysis([1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13])
 
 
 class IfChangedTest(DjangoPluginTestCase):
@@ -154,7 +190,7 @@ class IfChangedTest(DjangoPluginTestCase):
             'items': [("A", "X"), ("A", "Y"), ("B", "Z"), ("B", "W")],
         })
         self.assertEqual(squashed(text), 'AXYBZW')
-        self.assert_analysis([1, 2, 3, 4, 5])
+        self.assert_analysis([1, 2, 3, 5])
 
     def test_ifchanged_variable(self):
         self.make_template("""\
@@ -170,7 +206,7 @@ class IfChangedTest(DjangoPluginTestCase):
             'items': [("A", "X"), ("A", "Y"), ("B", "Z"), ("B", "W")],
         })
         self.assertEqual(squashed(text), 'AXYBZW')
-        self.assert_analysis([1, 2, 3, 4, 5])
+        self.assert_analysis([1, 2, 3, 5])
 
 
 @django_stop_before(4, 0)
