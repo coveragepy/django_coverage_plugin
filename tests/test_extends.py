@@ -95,6 +95,74 @@ class BlockTest(DjangoPluginTestCase):
         self.assert_analysis([1, 2, 3], name="base.html")
         self.assert_analysis([1, 4, 8], [8], name="specific.html")
 
+    def test_empty_parent_block_on_new_line_when_extended(self):
+        """
+        When a block is empty and extended, endblock should not appear
+        as an uncovered line.
+
+        https://github.com/coveragepy/django_coverage_plugin/issues/74
+        """
+        self.make_template(name="base.html", text="""\
+            Hello
+              {% block content %}
+              {% endblock content %}
+            Goodbye
+            """)
+        self.make_template(name="child.html", text="""\
+            {% extends "base.html" %}
+            {% block content %}
+              Override
+            {% endblock %}
+            """)
+        text = self.run_django_coverage(name="child.html")
+        self.assert_analysis([1, 2, 4], name="base.html")
+        self.assert_analysis([1, 3], name="child.html")
+        self.assertEqual(text.strip(), "Hello\n  \n  Override\n\nGoodbye")
+
+    def test_non_empty_parent_block_when_extended(self):
+        self.make_template(name="base.html", text="""\
+            Hello
+              {% block content %}
+                This line should be reported as uncovered.
+              {% endblock content %}
+            Goodbye
+            """)
+        self.make_template(name="child.html", text="""\
+            {% extends "base.html" %}
+            {% block content %}
+              Override
+            {% endblock %}
+            """)
+        text = self.run_django_coverage(name="child.html")
+        self.assert_analysis([1, 2, 3, 5], missing=[3], name="base.html")
+        self.assert_analysis([1, 3], name="child.html")
+
+        self.assertEqual(text.strip(), "Hello\n  \n  Override\n\nGoodbye")
+
+    def test_nested_blocks_outer_endblock_on_its_own_line(self):
+        """
+        When blocks are nested, on their own lines, and extended,
+        then endblock should not appear as uncovered.
+
+        Ref: https://github.com/coveragepy/django_coverage_plugin/issues/74
+        """
+        self.make_template(name="base.html", text="""\
+            {% block outer %}
+              {% block inner %}
+              {% endblock inner %}
+            {% endblock outer %}
+            """)
+        self.make_template(name="child.html", text="""\
+            {% extends "base.html" %}
+            {% block inner %}
+              Override
+            {% endblock %}
+            """)
+        text = self.run_django_coverage(name="child.html")
+        self.assert_analysis([1, 2], missing=[], name="base.html")
+        self.assert_analysis([1, 3], name="child.html")
+        self.assertEqual(text.strip(), "Override")
+
 
 class LoadTest(DjangoPluginTestCase):
     def test_load(self):
