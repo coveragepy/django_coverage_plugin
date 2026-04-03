@@ -20,8 +20,8 @@ A `coverage.py`_ plugin to measure test coverage of Django templates.
 .. |versions| image:: https://img.shields.io/pypi/pyversions/django_coverage_plugin.svg
     :target: https://pypi.python.org/pypi/django_coverage_plugin
     :alt: Supported Python Versions
-.. the Django badge says: `3.2 | 4.2 | 5.2`
-.. |djversions| image:: https://img.shields.io/badge/Django-3.2%20%7C%204.2%20%7C%205.2-44b78b.svg
+.. the Django badge says: `5.2 | 6.0`
+.. |djversions| image:: https://img.shields.io/badge/Django-5.2%20%7C%206.0-44b78b.svg
     :target: https://pypi.python.org/pypi/django_coverage_plugin
     :alt: Supported Django Versions
 .. |sponsor| image:: https://img.shields.io/badge/%E2%9D%A4-Sponsor%20me-brightgreen?style=flat&logo=GitHub
@@ -40,9 +40,9 @@ Supported on:
 
 - Python: 3.10 through 3.14.
 
-- Django: 3.2 through 5.2.
+- Django: 5.2 through 6.0.
 
-- Coverage.py: 6.x or higher.
+- Coverage.py: 7.x or higher.
 
 The plugin is pip-installable::
 
