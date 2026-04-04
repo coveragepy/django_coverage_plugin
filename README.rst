@@ -138,6 +138,22 @@ To run the tests::
     $ tox
 
 
+Authors
+~~~~~~~
+
+The Django coverage plugin was written by Ned Batchelder,
+with contributions by:
+
+- Andrew Pinkham
+- Aron Griffis
+- Bruno Alla
+- Emil Madsen
+- Federico Bond
+- Jessamyn Smith
+- Pamela McA'Nulty
+- Simon Charette
+
+
 History
 ~~~~~~~
 
