@@ -160,8 +160,8 @@ History
 
 .. scriv-insert-here
 
-Unreleased
-----------
+v3.2.1 — 2026-04-04
+-------------------
 
 Fix: ``{% endblock %}`` lines (and others) were falsely reported as unexecuted
 when they appeared on their own indented line (`issue 74`_). Thanks, Marc
