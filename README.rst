@@ -150,6 +150,7 @@ with contributions by:
 - Emil Madsen
 - Federico Bond
 - Jessamyn Smith
+- Marc Gibbons
 - Pamela McA'Nulty
 - Simon Charette
 
