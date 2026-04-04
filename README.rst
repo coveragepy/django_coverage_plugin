@@ -169,6 +169,8 @@ Gibbons (`pull 108`_).
 
 Dropped Django 3.x and 4.x.
 
+Switched to trusted publishing.
+
 .. _issue 74: https://github.com/coveragepy/django_coverage_plugin/issues/74
 .. _pull 108: https://github.com/coveragepy/django_coverage_plugin/pull/108
 

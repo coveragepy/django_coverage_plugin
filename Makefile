@@ -30,12 +30,6 @@ dist:					## Make the source distribution.
 	python -m build
 	python -m twine check dist/*
 
-pypi:					## Upload the built distributions to PyPI.
-	python -m twine upload --verbose dist/*
-
-test_pypi:				## Upload the distributions to test PyPI.
-	python -m twine upload --verbose --repository testpypi --password $$TWINE_TEST_PASSWORD dist/*
-
 _install_e:
 	python -m pip install -q -e .
 

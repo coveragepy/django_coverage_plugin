@@ -3,14 +3,9 @@
 - Version number in __init__.py
 - Classifiers in pyproject.toml
     https://pypi.python.org/pypi?%3Aaction=list_classifiers
-    eg:
-      Development Status :: 3 - Alpha
-      Development Status :: 5 - Production/Stable
 - Copyright date in NOTICE.txt
 - Update README.rst with latest changes
 - Kits:
-    $ make clean dist
-    $ make test_pypi
-    $ make pypi
     $ make tag
+    # .github/workflows/publish.yml publishes with trusted publishing
     $ make ghrelease
