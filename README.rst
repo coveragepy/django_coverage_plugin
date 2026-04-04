@@ -160,7 +160,7 @@ History
 
 .. scriv-insert-here
 
-v3.2.1 — 2026-04-04
+v3.2.2 — 2026-04-04
 -------------------
 
 Fix: ``{% endblock %}`` lines (and others) were falsely reported as unexecuted

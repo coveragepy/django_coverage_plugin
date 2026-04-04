@@ -3,7 +3,7 @@
 
 """Django Template Coverage Plugin"""
 
-__version__ = "3.2.1"
+__version__ = "3.2.2"
 
 from .plugin import DjangoTemplatePluginException  # noqa
 from .plugin import DjangoTemplatePlugin
