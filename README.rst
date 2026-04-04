@@ -160,6 +160,19 @@ History
 
 .. scriv-insert-here
 
+Unreleased
+----------
+
+Fix: ``{% endblock %}`` lines (and others) were falsely reported as unexecuted
+when they appeared on their own indented line (`issue 74`_). Thanks, `Marc
+Gibbons <pull 108_>`_.
+
+Dropped Django 3.x and 4.x.
+
+.. _issue 74: https://github.com/coveragepy/django_coverage_plugin/issues/74
+.. _pull 108: https://github.com/coveragepy/django_coverage_plugin/pull/108
+
+
 v3.2.0 — 2025-10-05
 -------------------
 
