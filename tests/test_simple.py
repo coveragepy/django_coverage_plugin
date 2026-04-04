@@ -238,6 +238,17 @@ class OtherTest(DjangoPluginTestCase):
         self.assertEqual(text, "\nalpha = 1, beta = 2.\n\n")
         self.assert_analysis([1, 2])
 
+    def test_endwith_not_at_start_of_line(self):
+        self.make_template("""\
+            <div>
+              {% with alpha=1 %}
+                {{ alpha }}
+              {% endwith %}
+            </div>
+            """)
+        self.run_django_coverage()
+        self.assert_analysis([1, 2, 3, 5])
+
 
 class StringTemplateTest(DjangoPluginTestCase):
 
