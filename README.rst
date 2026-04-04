@@ -97,15 +97,15 @@ extensions if you like::
     [django_coverage_plugin]
     template_extensions = html, txt, tex, email
 
-If you use ``pyproject.toml`` for tool configuration use::
+Block tags can be excluded using regexes to match the block content;
+for example, to exclude a custom template tag ``{% my_tag ... %}``, use::
 
-    [tool.coverage.run]
-    plugins = [
-        'django_coverage_plugin',
-    ]
+    [run]
+    plugins = django_coverage_plugin
 
-    [tool.coverage.django_coverage_plugin]
-    template_extensions = 'html, txt, tex, email'
+    [django_coverage_plugin]
+    exclude_blocks = ["my_tag.+"]
+
 
 Caveats
 ~~~~~~~
