@@ -115,6 +115,7 @@ class DjangoTemplatePlugin(
         self.extensions = [e.strip() for e in extensions.split(",")]
 
         self.debug_checked = False
+        self.exclude_lines = []
 
         self.django_template_dir = os.path.normcase(
             os.path.realpath(os.path.dirname(django.template.__file__))
@@ -135,6 +136,7 @@ class DjangoTemplatePlugin(
 
     def configure(self, config):
         self.html_report_dir = os.path.abspath(config.get_option("html:directory"))
+        self.exclude_lines = config.get_option("report:exclude_lines")
 
     def file_tracer(self, filename):
         if os.path.normcase(filename).startswith(self.django_template_dir):
@@ -147,7 +149,7 @@ class DjangoTemplatePlugin(
         return None
 
     def file_reporter(self, filename):
-        return FileReporter(filename)
+        return FileReporter(filename, self.exclude_lines)
 
     def find_executable_files(self, src_dir):
         # We're only interested in files that look like reasonable HTML
@@ -253,11 +255,16 @@ class DjangoTemplatePlugin(
 
 
 class FileReporter(coverage.plugin.FileReporter):
-    def __init__(self, filename):
+    exclude_re = None
+
+    def __init__(self, filename, exclude_patterns=None):
         super().__init__(filename)
         # TODO: html filenames are absolute.
 
         self._source = None
+        self._excluded = None
+        if exclude_patterns:
+            self.exclude_re = re.compile("|".join(f"(?:{p})" for p in exclude_patterns))
 
     def source(self):
         if self._source is None:
@@ -269,12 +276,13 @@ class FileReporter(coverage.plugin.FileReporter):
 
     def lines(self):
         source_lines = set()
+        excluded = set()
 
         if SHOW_PARSING:
             print(f"-------------- {self.filename}")
 
         lexer = Lexer(self.source())
-        tokens = lexer.tokenize()
+        tokens = list(lexer.tokenize())
 
         # Are we inside a comment?
         comment = False
@@ -282,8 +290,12 @@ class FileReporter(coverage.plugin.FileReporter):
         extends = False
         # Are we inside a block?
         inblock = False
+        # Pragma exclusion state
+        excluding = False
+        exclude_depth = 0  # tracks nesting so we find the correct closing tag
+        last_block_opener = None
 
-        for token in tokens:
+        for token_idx, token in enumerate(tokens):
             if SHOW_PARSING:
                 print(
                     "%10s %2d: %r"
@@ -293,6 +305,30 @@ class FileReporter(coverage.plugin.FileReporter):
                         token.contents,
                     )
                 )
+
+            # While inside an excluded block, add all lines to the
+            # excluded set and track nesting depth to find the matching
+            # closing tag.
+            if excluding:
+                excluded.add(token.lineno)
+                if token.token_type == TokenType.TEXT:
+                    lineno = token.lineno
+                    lines = token.contents.splitlines(True)
+                    num_lines = len(lines)
+                    if lines[0].isspace():
+                        lineno += 1
+                        num_lines -= 1
+                    excluded.update(range(lineno, lineno + num_lines))
+                elif token.token_type == TokenType.BLOCK:
+                    tag = token.contents.split()[0]
+                    if not tag.startswith("end"):
+                        exclude_depth += 1
+                    else:
+                        exclude_depth -= 1
+                        if exclude_depth == 0:
+                            excluding = False
+                continue
+
             if token.token_type == TokenType.BLOCK:
                 if token.contents == "endcomment":
                     comment = False
@@ -328,6 +364,7 @@ class FileReporter(coverage.plugin.FileReporter):
                 elif token.contents.startswith("extends"):
                     extends = True
 
+                last_block_opener = token
                 source_lines.add(token.lineno)
 
             elif token.token_type == TokenType.VAR:
@@ -351,10 +388,37 @@ class FileReporter(coverage.plugin.FileReporter):
                     num_lines -= 1
                 source_lines.update(range(lineno, lineno + num_lines))
 
+            # {# pragma: no cover #} — exclude this line, and if the
+            # comment sits on the same line as a block-opening tag,
+            # exclude the entire block through its matching end tag.
+            elif (
+                self.exclude_re is not None
+                and token.token_type == TokenType.COMMENT
+                and self.exclude_re.search("{# " + token.contents + " #}")
+            ):
+                excluded.add(token.lineno)
+                if last_block_opener is not None and last_block_opener.lineno == token.lineno:
+                    # Look ahead for a matching end tag to confirm
+                    # this is a block opener, not a self-closing tag.
+                    end_tag = "end" + last_block_opener.contents.split()[0]
+                    if any(
+                        t.token_type == TokenType.BLOCK and t.contents.split()[0] == end_tag
+                        for t in tokens[token_idx + 1 :]
+                    ):
+                        excluding = True
+                        exclude_depth = 1
+
             if SHOW_PARSING:
                 print(f"\t\t\tNow source_lines is: {source_lines!r}")
 
-        return source_lines
+        self._excluded = excluded
+        return source_lines - excluded
+
+    def excluded_lines(self):
+        """Return lines excluded via {# pragma: no cover #} comments."""
+        if self._excluded is None:
+            self.lines()
+        return self._excluded
 
 
 def running_sum(seq):

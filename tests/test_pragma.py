@@ -10,7 +10,6 @@ from .plugin_test import DjangoPluginTestCase
 
 
 class PragmaTest(DjangoPluginTestCase):
-
     def test_pragma_on_block_tag_excludes_entire_block(self):
         for condition in (True, False):
             with self.subTest(condition=condition):
@@ -21,7 +20,7 @@ class PragmaTest(DjangoPluginTestCase):
                     {% endif %}
                     After
                     """)
-                self.run_django_coverage(context={'condition': condition, 'content': 'hi'})
+                self.run_django_coverage(context={"condition": condition, "content": "hi"})
                 self.assert_analysis([1, 5])
 
     def test_pragma_on_plain_text_line(self):
@@ -34,7 +33,7 @@ class PragmaTest(DjangoPluginTestCase):
         self.assert_analysis([1, 3])
 
     def test_pragma_on_non_closing_tag(self):
-        """Test that pragma does not treat tags like {% cycle $} as blocks."""
+        """Test that pragma does not treat tags like {% cycle %} as blocks."""
         self.make_template("""\
             <div>
                 {% cycle 'a' 'b' as values %}{# pragma: no cover #}
@@ -56,7 +55,7 @@ class PragmaTest(DjangoPluginTestCase):
             After
             """)
         self.run_django_coverage(
-            context={'condition': True, 'items': ['a', 'b']},
+            context={"condition": True, "items": ["a", "b"]},
         )
         self.assert_analysis([1, 7])
 
@@ -75,14 +74,15 @@ class PragmaTest(DjangoPluginTestCase):
             After
             """)
         tem = get_template(self.template_file)
-        self.cov = coverage.Coverage(source=['.'])
+        self.cov = coverage.Coverage(source=["."])
         self.append_config("run:plugins", "django_coverage_plugin")
         # Set the exclude_lines with own patterns.
         self.cov.config.set_option(
-            "report:exclude_lines", ["noqa: no-cover", "!SKIP ME!"],
+            "report:exclude_lines",
+            ["noqa: no-cover", "!SKIP ME!"],
         )
         self.cov.start()
-        tem.render({'condition': True, 'content': 'hi'})
+        tem.render({"condition": True, "content": "hi"})
         self.cov.stop()
         self.cov.save()
         self.assert_analysis([1, 5, 7, 9, 10], missing=[7])  # Expecting 1 missing line
