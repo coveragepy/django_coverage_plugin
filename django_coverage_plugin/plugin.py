@@ -100,7 +100,7 @@ def read_template_source(filename):
     if not settings.configured:
         settings.configure()
 
-    with open(filename, "r", encoding="utf-8") as f:
+    with open(filename, encoding="utf-8") as f:
         text = f.read()
 
     return text
@@ -129,7 +129,7 @@ class DjangoTemplatePlugin(
             ("django_template_dir", self.django_template_dir),
             (
                 "environment",
-                sorted(("{} = {}".format(k, v)) for k, v in os.environ.items() if "DJANGO" in k),
+                sorted((f"{k} = {v}") for k, v in os.environ.items() if "DJANGO" in k),
             ),
         ]
 
@@ -226,7 +226,7 @@ class DjangoTemplatePlugin(
         if start < 0 or end < 0:
             start, end = -1, -1
         if SHOW_TRACING:
-            print("line_number_range({}) -> {}".format(filename, (start, end)))
+            print(f"line_number_range({filename}) -> {(start, end)}")
         return start, end
 
     # --- FileTracer helpers
