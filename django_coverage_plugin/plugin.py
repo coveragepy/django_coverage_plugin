@@ -69,8 +69,8 @@ def check_debug():
     return True
 
 
-if django.VERSION < (3, 0):
-    raise RuntimeError("Django Coverage Plugin requires Django 3.x or higher")
+if django.VERSION < (5, 0):
+    raise RuntimeError("Django Coverage Plugin requires Django 5.x or higher")
 
 
 # Since we are grabbing at internal details, we have to adapt as they

@@ -5,7 +5,7 @@
 
 import textwrap
 
-from .plugin_test import DjangoPluginTestCase, django_stop_before, squashed
+from .plugin_test import DjangoPluginTestCase, squashed
 
 
 class IfTest(DjangoPluginTestCase):
@@ -206,40 +206,4 @@ class IfChangedTest(DjangoPluginTestCase):
             'items': [("A", "X"), ("A", "Y"), ("B", "Z"), ("B", "W")],
         })
         self.assertEqual(squashed(text), 'AXYBZW')
-        self.assert_analysis([1, 2, 3, 5])
-
-
-@django_stop_before(4, 0)
-class IfEqualTest(DjangoPluginTestCase):
-
-    def test_ifequal(self):
-        self.make_template("""\
-            {% for i,x in items %}
-                {% ifequal x "X" %}
-                    X
-                {% endifequal %}
-                {{ i }}
-            {% endfor %}
-            """)
-
-        text = self.run_django_coverage(context={
-            'items': [(0, 'A'), (1, 'X'), (2, 'X'), (3, 'B')],
-        })
-        self.assertEqual(squashed(text), '0X1X23')
-        self.assert_analysis([1, 2, 3, 5])
-
-    def test_ifnotequal(self):
-        self.make_template("""\
-            {% for i,x in items %}
-                {% ifnotequal x "X" %}
-                    X
-                {% endifnotequal %}
-                {{ i }}
-            {% endfor %}
-            """)
-
-        text = self.run_django_coverage(context={
-            'items': [(0, 'A'), (1, 'X'), (2, 'X'), (3, 'B')],
-        })
-        self.assertEqual(squashed(text), 'X012X3')
         self.assert_analysis([1, 2, 3, 5])
