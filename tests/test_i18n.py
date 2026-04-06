@@ -7,7 +7,6 @@ from .plugin_test import DjangoPluginTestCase
 
 
 class I18nTest(DjangoPluginTestCase):
-
     def test_trans(self):
         self.make_template("""\
             {% load i18n %}
@@ -44,10 +43,10 @@ class I18nTest(DjangoPluginTestCase):
             """)
         # It doesn't make a difference whether you use the plural or not, we
         # can't tell, so the singluar and plural are always marked as used.
-        text = self.run_django_coverage(context={'cats': ['snowy']})
+        text = self.run_django_coverage(context={"cats": ["snowy"]})
         self.assertEqual(text, "\n\nThere is one cat.\n\nbye.\n")
         self.assert_analysis([1, 2, 3, 4, 5, 7])
 
-        text = self.run_django_coverage(context={'cats': ['snowy', 'coaly']})
+        text = self.run_django_coverage(context={"cats": ["snowy", "coaly"]})
         self.assertEqual(text, "\n\nThere are 2 cats.\n\nbye.\n")
         self.assert_analysis([1, 2, 3, 4, 5, 7])

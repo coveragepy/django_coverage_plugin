@@ -6,7 +6,7 @@
 from .plugin_test import DjangoPluginTestCase
 
 # 200 Unicode chars: snowman + poo.
-UNIUNI = "\u26C4\U0001F4A9"*100
+UNIUNI = "\u26c4\U0001f4a9" * 100
 if isinstance(UNIUNI, str):
     UNISTR = UNIUNI
 else:
@@ -14,24 +14,23 @@ else:
 
 
 class SimpleTemplateTest(DjangoPluginTestCase):
-
     def test_one_line(self):
-        self.make_template('Hello')
+        self.make_template("Hello")
         text = self.run_django_coverage()
-        self.assertEqual(text, 'Hello')
+        self.assertEqual(text, "Hello")
         self.assert_analysis([1])
 
     def test_plain_text(self):
-        self.make_template('Hello\nWorld\n\nGoodbye')
+        self.make_template("Hello\nWorld\n\nGoodbye")
         text = self.run_django_coverage()
-        self.assertEqual(text, 'Hello\nWorld\n\nGoodbye')
+        self.assertEqual(text, "Hello\nWorld\n\nGoodbye")
         self.assert_analysis([1, 2, 3, 4])
 
     def test_variable(self):
         self.make_template("""\
             Hello, {{name}}
             """)
-        text = self.run_django_coverage(context={'name': 'John'})
+        text = self.run_django_coverage(context={"name": "John"})
         self.assertEqual(text, "Hello, John\n")
         self.assert_analysis([1])
 
@@ -40,7 +39,7 @@ class SimpleTemplateTest(DjangoPluginTestCase):
             Hello,
             {{name}}
             """)
-        text = self.run_django_coverage(context={'name': 'John'})
+        text = self.run_django_coverage(context={"name": "John"})
         self.assertEqual(text, "Hello,\nJohn\n")
         self.assert_analysis([1, 2])
 
@@ -48,14 +47,14 @@ class SimpleTemplateTest(DjangoPluginTestCase):
         self.make_template("""\
             {{name}}
             """)
-        text = self.run_django_coverage(context={'name': 'John'})
+        text = self.run_django_coverage(context={"name": "John"})
         self.assertEqual(text, "John\n")
         self.assert_analysis([1])
 
     def test_long_text(self):
-        self.make_template("line\n"*50)
+        self.make_template("line\n" * 50)
         text = self.run_django_coverage()
-        self.assertEqual(text, "line\n"*50)
+        self.assertEqual(text, "line\n" * 50)
         self.assert_analysis(list(range(1, 51)))
 
     def test_non_ascii(self):
@@ -63,15 +62,14 @@ class SimpleTemplateTest(DjangoPluginTestCase):
             υηιcσɗє ιѕ тяιcку
             {{more}}!
             """)
-        text = self.run_django_coverage(context={'more': 'ɘboɔinU'})
-        self.assertEqual(text, 'υηιcσɗє ιѕ тяιcку\nɘboɔinU!\n')
+        text = self.run_django_coverage(context={"more": "ɘboɔinU"})
+        self.assertEqual(text, "υηιcσɗє ιѕ тяιcку\nɘboɔinU!\n")
         self.assert_analysis([1, 2])
         self.assertEqual(self.get_html_report(), 100)
         self.assertEqual(self.get_xml_report(), 100)
 
 
 class CommentTest(DjangoPluginTestCase):
-
     def test_simple(self):
         self.make_template("""\
             First
@@ -123,7 +121,7 @@ class OtherTest(DjangoPluginTestCase):
             {% endautoescape %}
             Last
             """)
-        text = self.run_django_coverage(context={'body': '<Hello>'})
+        text = self.run_django_coverage(context={"body": "<Hello>"})
         self.assertEqual(text, "First\n\n&lt;Hello&gt;\n\n\n<Hello>\n\nLast\n")
         self.assert_analysis([1, 2, 3, 5, 6, 8])
 
@@ -145,11 +143,11 @@ class OtherTest(DjangoPluginTestCase):
             {% firstof var2 var3 "plugh" %}
             {% firstof var3 "quux" %}
             """)
-        text = self.run_django_coverage(context={'var1': 'A'})
+        text = self.run_django_coverage(context={"var1": "A"})
         self.assertEqual(text, "A\nplugh\nquux\n")
         self.assert_analysis([1, 2, 3])
 
-        text = self.run_django_coverage(context={'var2': 'B'})
+        text = self.run_django_coverage(context={"var2": "B"})
         self.assertEqual(text, "B\nB\nquux\n")
         self.assert_analysis([1, 2, 3])
 
@@ -202,7 +200,8 @@ class OtherTest(DjangoPluginTestCase):
         self.assert_analysis([1, 2])
 
     def test_verbatim(self):
-        self.make_template("""\
+        self.make_template(
+            """\
             1
             {% verbatim %}
             {{if dying}}Alive.{{/if}}
@@ -210,12 +209,14 @@ class OtherTest(DjangoPluginTestCase):
             {%third%}.UNISTR
             {% endverbatim %}
             7
-            """.replace("UNISTR", UNISTR))
+            """.replace("UNISTR", UNISTR)
+        )
         text = self.run_django_coverage()
         self.assertEqual(
             text,
-            "1\n\n{{if dying}}Alive.{{/if}}\nsecond.\n"
-            "{%third%}.UNIUNI\n\n7\n".replace("UNIUNI", UNIUNI)
+            "1\n\n{{if dying}}Alive.{{/if}}\nsecond.\n{%third%}.UNIUNI\n\n7\n".replace(
+                "UNIUNI", UNIUNI
+            ),
         )
         self.assert_analysis([1, 2, 3, 4, 5, 7])
 
@@ -251,7 +252,6 @@ class OtherTest(DjangoPluginTestCase):
 
 
 class StringTemplateTest(DjangoPluginTestCase):
-
     run_in_temp_dir = False
 
     def test_string_template(self):
@@ -260,18 +260,15 @@ class StringTemplateTest(DjangoPluginTestCase):
         with self.assert_no_data(min_cov=(6, 0)):
             text = self.run_django_coverage(
                 text="Hello, {{name}}!",
-                context={'name': 'World'},
+                context={"name": "World"},
                 options={},
-                )
+            )
         self.assertEqual(text, "Hello, World!")
 
 
 class BranchTest(DjangoPluginTestCase):
-
     def test_with_branch_enabled(self):
-        self.make_template('Hello\nWorld\n\nGoodbye')
-        text = self.run_django_coverage(
-            options={'source': ["."], 'branch': True}
-            )
-        self.assertEqual(text, 'Hello\nWorld\n\nGoodbye')
+        self.make_template("Hello\nWorld\n\nGoodbye")
+        text = self.run_django_coverage(options={"source": ["."], "branch": True})
+        self.assertEqual(text, "Hello\nWorld\n\nGoodbye")
         self.assert_analysis([1, 2, 3, 4])

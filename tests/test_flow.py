@@ -9,7 +9,6 @@ from .plugin_test import DjangoPluginTestCase, squashed
 
 
 class IfTest(DjangoPluginTestCase):
-
     def test_if(self):
         self.make_template("""\
             {% if foo %}
@@ -17,12 +16,12 @@ class IfTest(DjangoPluginTestCase):
             {% endif %}
             """)
 
-        text = self.run_django_coverage(context={'foo': True})
-        self.assertEqual(text.strip(), 'Hello')
+        text = self.run_django_coverage(context={"foo": True})
+        self.assertEqual(text.strip(), "Hello")
         self.assert_analysis([1, 2])
 
-        text = self.run_django_coverage(context={'foo': False})
-        self.assertEqual(text.strip(), '')
+        text = self.run_django_coverage(context={"foo": False})
+        self.assertEqual(text.strip(), "")
         self.assert_analysis([1, 2], [2])
 
     def test_endif_not_at_start_of_line(self):
@@ -34,7 +33,7 @@ class IfTest(DjangoPluginTestCase):
               After
             </article>
             """)
-        self.run_django_coverage(context={'foo': False})
+        self.run_django_coverage(context={"foo": False})
         self.assert_analysis([1, 2, 3, 5, 6], missing=[3])
 
     def test_else_not_at_start_of_line(self):
@@ -47,7 +46,7 @@ class IfTest(DjangoPluginTestCase):
               {% endif %}
             </article>
             """)
-        self.run_django_coverage(context={'foo': True})
+        self.run_django_coverage(context={"foo": True})
         self.assert_analysis([1, 2, 3, 5, 7], missing=[5])
 
     def test_if_else(self):
@@ -59,12 +58,12 @@ class IfTest(DjangoPluginTestCase):
             {% endif %}
             """)
 
-        text = self.run_django_coverage(context={'foo': True})
-        self.assertEqual(text.strip(), 'Hello')
+        text = self.run_django_coverage(context={"foo": True})
+        self.assertEqual(text.strip(), "Hello")
         self.assert_analysis([1, 2, 4], [4])
 
-        text = self.run_django_coverage(context={'foo': False})
-        self.assertEqual(text.strip(), 'Goodbye')
+        text = self.run_django_coverage(context={"foo": False})
+        self.assertEqual(text.strip(), "Goodbye")
         self.assert_analysis([1, 2, 4], [2])
 
     def test_if_elif_else(self):
@@ -78,16 +77,16 @@ class IfTest(DjangoPluginTestCase):
             {% endif %}
             """)
 
-        text = self.run_django_coverage(context={'foo': True, 'bar': False})
-        self.assertEqual(text.strip(), 'Hello')
+        text = self.run_django_coverage(context={"foo": True, "bar": False})
+        self.assertEqual(text.strip(), "Hello")
         self.assert_analysis([1, 2, 4, 6], [4, 6])
 
-        text = self.run_django_coverage(context={'foo': False, 'bar': True})
-        self.assertEqual(text.strip(), 'Aloha')
+        text = self.run_django_coverage(context={"foo": False, "bar": True})
+        self.assertEqual(text.strip(), "Aloha")
         self.assert_analysis([1, 2, 4, 6], [2, 6])
 
-        text = self.run_django_coverage(context={'foo': False, 'bar': False})
-        self.assertEqual(text.strip(), 'Goodbye')
+        text = self.run_django_coverage(context={"foo": False, "bar": False})
+        self.assertEqual(text.strip(), "Goodbye")
         self.assert_analysis([1, 2, 4, 6], [2, 4])
 
 
@@ -101,11 +100,11 @@ class LoopTest(DjangoPluginTestCase):
             After
             """)
 
-        text = self.run_django_coverage(context={'items': "ABC"})
+        text = self.run_django_coverage(context={"items": "ABC"})
         self.assertEqual(text, "Before\n\n-A\n\n+B\n\n-C\n\nAfter\n")
         self.assert_analysis([1, 2, 3, 5])
 
-        text = self.run_django_coverage(context={'items': ""})
+        text = self.run_django_coverage(context={"items": ""})
         self.assertEqual(text, "Before\n\nAfter\n")
         self.assert_analysis([1, 2, 3, 5], [3])
 
@@ -117,7 +116,7 @@ class LoopTest(DjangoPluginTestCase):
               {% endfor %}
             </ul>
             """)
-        self.run_django_coverage(context={'items': []})
+        self.run_django_coverage(context={"items": []})
         self.assert_analysis([1, 2, 3, 5], missing=[3])
 
     def test_loop_with_empty_clause(self):
@@ -131,11 +130,11 @@ class LoopTest(DjangoPluginTestCase):
             After
             """)
 
-        text = self.run_django_coverage(context={'items': "ABC"})
+        text = self.run_django_coverage(context={"items": "ABC"})
         self.assertEqual(text, "Before\n\n-A\n\n-B\n\n-C\n\nAfter\n")
         self.assert_analysis([1, 2, 3, 5, 7], [5])
 
-        text = self.run_django_coverage(context={'items': ""})
+        text = self.run_django_coverage(context={"items": ""})
         self.assertEqual(text, "Before\n\nNONE\n\nAfter\n")
         self.assert_analysis([1, 2, 3, 5, 7], [3])
 
@@ -156,26 +155,30 @@ class LoopTest(DjangoPluginTestCase):
             </ul>
             {% endspaceless %}
             """)
-        text = self.run_django_coverage(context={
-            'cities': [
-                {'name': 'Mumbai', 'population': '19', 'country': 'India'},
-                {'name': 'Calcutta', 'population': '15', 'country': 'India'},
-                {'name': 'New York', 'population': '20', 'country': 'USA'},
-                {'name': 'Chicago', 'population': '7', 'country': 'USA'},
-                {'name': 'Tokyo', 'population': '33', 'country': 'Japan'},
-            ],
-            })
-        self.assertEqual(text, textwrap.dedent("""\
+        text = self.run_django_coverage(
+            context={
+                "cities": [
+                    {"name": "Mumbai", "population": "19", "country": "India"},
+                    {"name": "Calcutta", "population": "15", "country": "India"},
+                    {"name": "New York", "population": "20", "country": "USA"},
+                    {"name": "Chicago", "population": "7", "country": "USA"},
+                    {"name": "Tokyo", "population": "33", "country": "Japan"},
+                ],
+            }
+        )
+        self.assertEqual(
+            text,
+            textwrap.dedent("""\
             <ul><li>India
                 <ul><li>Mumbai: 19</li><li>Calcutta: 15</li></ul></li><li>USA
                 <ul><li>New York: 20</li><li>Chicago: 7</li></ul></li><li>Japan
                 <ul><li>Tokyo: 33</li></ul></li></ul>
-            """))
+            """),
+        )
         self.assert_analysis([1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13])
 
 
 class IfChangedTest(DjangoPluginTestCase):
-
     def test_ifchanged(self):
         self.make_template("""\
             {% for a,b in items %}
@@ -186,10 +189,12 @@ class IfChangedTest(DjangoPluginTestCase):
             {% endfor %}
             """)
 
-        text = self.run_django_coverage(context={
-            'items': [("A", "X"), ("A", "Y"), ("B", "Z"), ("B", "W")],
-        })
-        self.assertEqual(squashed(text), 'AXYBZW')
+        text = self.run_django_coverage(
+            context={
+                "items": [("A", "X"), ("A", "Y"), ("B", "Z"), ("B", "W")],
+            }
+        )
+        self.assertEqual(squashed(text), "AXYBZW")
         self.assert_analysis([1, 2, 3, 5])
 
     def test_ifchanged_variable(self):
@@ -202,8 +207,10 @@ class IfChangedTest(DjangoPluginTestCase):
             {% endfor %}
             """)
 
-        text = self.run_django_coverage(context={
-            'items': [("A", "X"), ("A", "Y"), ("B", "Z"), ("B", "W")],
-        })
-        self.assertEqual(squashed(text), 'AXYBZW')
+        text = self.run_django_coverage(
+            context={
+                "items": [("A", "X"), ("A", "Y"), ("B", "Z"), ("B", "W")],
+            }
+        )
+        self.assertEqual(squashed(text), "AXYBZW")
         self.assert_analysis([1, 2, 3, 5])

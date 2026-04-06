@@ -9,7 +9,6 @@ from .plugin_test import DjangoPluginTestCase
 
 
 class HtmlTest(DjangoPluginTestCase):
-
     def test_simple(self):
         self.make_template("""\
             Simple © 2015

@@ -23,34 +23,36 @@ from django_coverage_plugin.plugin import DjangoTemplatePlugin
 def get_test_settings():
     """Create a dict full of default Django settings for the tests."""
     the_settings = {
-        'CACHES': {
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        "CACHES": {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
             },
         },
-        'DATABASES': {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
+        "DATABASES": {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": ":memory:",
             }
         },
-        'ROOT_URLCONF': 'tests',
+        "ROOT_URLCONF": "tests",
     }
 
-    the_settings.update({
-        'TEMPLATES': [
-            {
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'DIRS': ['templates'],      # where the tests put things.
-                'OPTIONS': {
-                    'debug': True,
-                    'loaders': [
-                        'django.template.loaders.filesystem.Loader',
-                    ]
+    the_settings.update(
+        {
+            "TEMPLATES": [
+                {
+                    "BACKEND": "django.template.backends.django.DjangoTemplates",
+                    "DIRS": ["templates"],  # where the tests put things.
+                    "OPTIONS": {
+                        "debug": True,
+                        "loaders": [
+                            "django.template.loaders.filesystem.Loader",
+                        ],
+                    },
                 },
-            },
-        ],
-    })
+            ],
+        }
+    )
 
     return the_settings
 
@@ -85,9 +87,7 @@ class DjangoPluginTestCase(StdStreamCapturingMixin, TempDirMixin, TestCase):
         template_path = self._path(self.template_file)
         return os.path.abspath(self.make_file(template_path, text))
 
-    def run_django_coverage(
-        self, name=None, text=None, context=None, options=None, using=None
-    ):
+    def run_django_coverage(self, name=None, text=None, context=None, options=None, using=None):
         """Run a template under coverage.
 
         The data context is `context` if provided, else {}.
@@ -105,10 +105,11 @@ class DjangoPluginTestCase(StdStreamCapturingMixin, TempDirMixin, TestCase):
         use_real_context = False
 
         if options is None:
-            options = {'source': ["."]}
+            options = {"source": ["."]}
 
         if using:
             from django.template import engines
+
             engine = engines[using]
             if text is not None:
                 tem = engine.from_string(text)
@@ -134,7 +135,7 @@ class DjangoPluginTestCase(StdStreamCapturingMixin, TempDirMixin, TestCase):
         self.cov.stop()
         self.cov.save()
         # Warning! Accessing secret internals!
-        if hasattr(self.cov, 'plugins'):
+        if hasattr(self.cov, "plugins"):
             plugins = self.cov.plugins
         else:
             plugins = self.cov._plugins
@@ -191,14 +192,16 @@ class DjangoPluginTestCase(StdStreamCapturingMixin, TempDirMixin, TestCase):
             executable,
             actual_executable,
             "Executable lines aren't as expected: {!r} != {!r}".format(
-                executable, actual_executable,
+                executable,
+                actual_executable,
             ),
         )
         self.assertEqual(
             missing or [],
             actual_missing,
             "Missing lines aren't as expected: {!r} != {!r}".format(
-                missing, actual_missing,
+                missing,
+                actual_missing,
             ),
         )
 
@@ -239,6 +242,7 @@ class DjangoPluginTestCase(StdStreamCapturingMixin, TempDirMixin, TestCase):
             return
         elif coverage.version_info >= (6, 0):
             import coverage.exceptions as cov_exc
+
             ctxmgr = self.assertWarns(cov_exc.CoverageWarning)
         else:
             ctxmgr = contextlib.nullcontext()
@@ -280,4 +284,5 @@ def squashed(s):
 
 class PluginDisabled(Exception):
     """Raised if we find that our plugin has been disabled."""
+
     pass

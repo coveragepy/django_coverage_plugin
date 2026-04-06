@@ -17,6 +17,7 @@ from django.templatetags.i18n import BlockTranslateNode
 
 class DjangoTemplatePluginException(Exception):
     """Used for any errors from the plugin itself."""
+
     pass
 
 
@@ -42,6 +43,7 @@ def check_debug():
     # I _think_ this check is all that's needed and the 3 "hasattr" checks
     # below can be removed, but it's not clear how to verify that
     from django.apps import apps
+
     if not apps.ready:
         return False
 
@@ -58,13 +60,9 @@ def check_debug():
 
     for engine in django.template.engines.all():
         if not isinstance(engine, django.template.backends.django.DjangoTemplates):
-            raise DjangoTemplatePluginException(
-                "Can't use non-Django templates."
-            )
+            raise DjangoTemplatePluginException("Can't use non-Django templates.")
         if not engine.engine.debug:
-            raise DjangoTemplatePluginException(
-                "Template debugging must be enabled in settings."
-            )
+            raise DjangoTemplatePluginException("Template debugging must be enabled in settings.")
 
     return True
 
@@ -112,16 +110,15 @@ class DjangoTemplatePlugin(
     coverage.plugin.CoveragePlugin,
     coverage.plugin.FileTracer,
 ):
-
     def __init__(self, options):
         extensions = options.get("template_extensions", "html,htm,txt")
         self.extensions = [e.strip() for e in extensions.split(",")]
 
         self.debug_checked = False
 
-        self.django_template_dir = os.path.normcase(os.path.realpath(
-            os.path.dirname(django.template.__file__)
-        ))
+        self.django_template_dir = os.path.normcase(
+            os.path.realpath(os.path.dirname(django.template.__file__))
+        )
 
         self.source_map = {}
 
@@ -130,11 +127,10 @@ class DjangoTemplatePlugin(
     def sys_info(self):
         return [
             ("django_template_dir", self.django_template_dir),
-            ("environment", sorted(
-                ("{} = {}".format(k, v))
-                for k, v in os.environ.items()
-                if "DJANGO" in k
-            )),
+            (
+                "environment",
+                sorted(("{} = {}".format(k, v)) for k, v in os.environ.items() if "DJANGO" in k),
+            ),
         ]
 
     def configure(self, config):
@@ -159,7 +155,7 @@ class DjangoTemplatePlugin(
         # funny characters that probably mean they are editor junk.
         rx = r"^[^.#~!$@%^&*()+=,]+\.(" + "|".join(self.extensions) + r")$"
 
-        for (dirpath, dirnames, filenames) in os.walk(src_dir):
+        for dirpath, dirnames, filenames in os.walk(src_dir):
             if dirpath == self.html_report_dir:
                 # Don't confuse the HTML report with HTML templates.
                 continue
@@ -196,7 +192,7 @@ class DjangoTemplatePlugin(
         if 0:
             dump_frame(frame, label="line_number_range")
 
-        render_self = frame.f_locals['self']
+        render_self = frame.f_locals["self"]
         if isinstance(render_self, (NodeList, Template)):
             return -1, -1
 
@@ -226,13 +222,11 @@ class DjangoTemplatePlugin(
         filename = filename_for_frame(frame)
         line_map = self.get_line_map(filename)
         start = get_line_number(line_map, s_start)
-        end = get_line_number(line_map, s_end-1)
+        end = get_line_number(line_map, s_end - 1)
         if start < 0 or end < 0:
             start, end = -1, -1
         if SHOW_TRACING:
-            print("line_number_range({}) -> {}".format(
-                filename, (start, end)
-            ))
+            print("line_number_range({}) -> {}".format(filename, (start, end)))
         return start, end
 
     # --- FileTracer helpers
@@ -251,9 +245,9 @@ class DjangoTemplatePlugin(
         """
         if filename not in self.source_map:
             template_source = read_template_source(filename)
-            if 0:   # change to see the template text
+            if 0:  # change to see the template text
                 for i in range(0, len(template_source), 10):
-                    print("%3d: %r" % (i, template_source[i:i+10]))
+                    print("%3d: %r" % (i, template_source[i : i + 10]))
             self.source_map[filename] = make_line_map(template_source)
         return self.source_map[filename]
 
@@ -292,7 +286,8 @@ class FileReporter(coverage.plugin.FileReporter):
         for token in tokens:
             if SHOW_PARSING:
                 print(
-                    "%10s %2d: %r" % (
+                    "%10s %2d: %r"
+                    % (
                         token.token_type.capitalize(),
                         token.lineno,
                         token.contents,
@@ -352,11 +347,9 @@ class FileReporter(coverage.plugin.FileReporter):
                 # When a tag is not at the start of a line, the preceding
                 # TEXT token ends with whitespace and no newline.
                 # That partial line is not executable content.
-                if num_lines > 0 and (
-                    lines[-1].isspace() and not lines[-1].endswith(("\n", "\r"))
-                ):
+                if num_lines > 0 and (lines[-1].isspace() and not lines[-1].endswith(("\n", "\r"))):
                     num_lines -= 1
-                source_lines.update(range(lineno, lineno+num_lines))
+                source_lines.update(range(lineno, lineno + num_lines))
 
             if SHOW_PARSING:
                 print(f"\t\t\tNow source_lines is: {source_lines!r}")
@@ -388,19 +381,21 @@ def get_line_number(line_map, offset):
 def dump_frame(frame, label=""):
     """Dump interesting information about this frame."""
     locals = dict(frame.f_locals)
-    self = locals.get('self', None)
-    context = locals.get('context', None)
+    self = locals.get("self", None)
+    context = locals.get("context", None)
     if "__builtins__" in locals:
         del locals["__builtins__"]
 
     if label:
         label = " ( %s ) " % label
     print("-- frame --%s---------------------" % label)
-    print("{}:{}:{}".format(
-        os.path.basename(frame.f_code.co_filename),
-        frame.f_lineno,
-        type(self),
-        ))
+    print(
+        "{}:{}:{}".format(
+            os.path.basename(frame.f_code.co_filename),
+            frame.f_lineno,
+            type(self),
+        )
+    )
     print(locals)
     if self:
         print("self:", self.__dict__)

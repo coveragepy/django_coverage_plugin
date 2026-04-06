@@ -28,7 +28,7 @@ def set_warnings():
         "ignore",
         category=UserWarning,
         message=r"Overriding setting DATABASES can lead to unexpected behavior.",
-        )
+    )
 
     # Django has warnings like RemovedInDjango40Warning.  We use features that are going to be
     # deprecated, so we don't need to see those warnings. But the specific warning classes change

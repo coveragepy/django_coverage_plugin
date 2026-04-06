@@ -15,7 +15,6 @@ from .plugin_test import DjangoPluginTestCase
 
 
 class FindSourceTest(DjangoPluginTestCase):
-
     def test_finding_source(self):
         # This is a template that is rendered.
         self.make_template(name="main.html", text="Hello")
@@ -43,12 +42,15 @@ class FindSourceTest(DjangoPluginTestCase):
         self.assert_measured_files("main.html", "unused.html", "unused.htm", "unused.txt")
 
     def test_customized_extensions(self):
-        self.make_file(".coveragerc", """\
+        self.make_file(
+            ".coveragerc",
+            """\
             [run]
             plugins = django_coverage_plugin
             [django_coverage_plugin]
             template_extensions = html, tex
-            """)
+            """,
+        )
         # This is a template that is rendered.
         self.make_template(name="main.html", text="Hello")
         # These are templates that aren't rendered, but are considered renderable.
@@ -75,11 +77,14 @@ class FindSourceTest(DjangoPluginTestCase):
 
     def test_non_utf8_error(self):
         # A non-UTF8 text file will raise an error.
-        self.make_file(".coveragerc", """\
+        self.make_file(
+            ".coveragerc",
+            """\
             [run]
             plugins = django_coverage_plugin
             source = .
-            """)
+            """,
+        )
         # This is a template that is rendered.
         self.make_template(name="main.html", text="Hello")
         # Extra file containing a word encoded in CP-1252
@@ -95,13 +100,16 @@ class FindSourceTest(DjangoPluginTestCase):
 
     def test_non_utf8_omitted(self):
         # If we omit the directory with the non-UTF8 file, all is well.
-        self.make_file(".coveragerc", """\
+        self.make_file(
+            ".coveragerc",
+            """\
             [run]
             plugins = django_coverage_plugin
             source = .
             [report]
             omit = */static/*
-            """)
+            """,
+        )
         # This is a template that is rendered.
         self.make_template(name="main.html", text="Hello")
         # Extra file containing a word encoded in CP-1252
@@ -116,13 +124,16 @@ class FindSourceTest(DjangoPluginTestCase):
 
     def test_non_utf8_ignored(self):
         # If we ignore reporting errors, a non-UTF8 text file is fine.
-        self.make_file(".coveragerc", """\
+        self.make_file(
+            ".coveragerc",
+            """\
             [run]
             plugins = django_coverage_plugin
             source = .
             [report]
             ignore_errors = True
-            """)
+            """,
+        )
         # This is a template that is rendered.
         self.make_template(name="main.html", text="Hello")
         # Extra file containing a word encoded in CP-1252
@@ -134,19 +145,22 @@ class FindSourceTest(DjangoPluginTestCase):
         self.assert_measured_files("main.html", f"static{os.sep}changelog.txt")
         self.assert_analysis([1], name="main.html")
         warn_msg = (
-            "'utf-8' codec can't decode byte 0xf6 in position 2: " +
-            "invalid start byte (couldnt-parse)"
+            "'utf-8' codec can't decode byte 0xf6 in position 2: "
+            + "invalid start byte (couldnt-parse)"
         )
         with self.assert_coverage_warnings(warn_msg, min_cov=(6, 0)):
             self.cov.html_report()
 
     def test_htmlcov_isnt_measured(self):
         # We used to find the HTML report and think it was template files.
-        self.make_file(".coveragerc", """\
+        self.make_file(
+            ".coveragerc",
+            """\
             [run]
             plugins = django_coverage_plugin
             source = .
-            """)
+            """,
+        )
         self.make_template(name="main.html", text="Hello")
         text = self.run_django_coverage(name="main.html")
         self.assertEqual(text, "Hello")
@@ -160,13 +174,16 @@ class FindSourceTest(DjangoPluginTestCase):
 
     def test_custom_html_report_isnt_measured(self):
         # We used to find the HTML report and think it was template files.
-        self.make_file(".coveragerc", """\
+        self.make_file(
+            ".coveragerc",
+            """\
             [run]
             plugins = django_coverage_plugin
             source = .
             [html]
             directory = my_html_report
-            """)
+            """,
+        )
         self.make_template(name="main.html", text="Hello")
         text = self.run_django_coverage(name="main.html")
         self.assertEqual(text, "Hello")
