@@ -97,16 +97,47 @@ class PragmaTest(DjangoPluginTestCase):
             {% lorem %}{# I'm covered! #}
             After
             """)
+        self.make_file(
+            ".coveragerc",
+            """\
+            [run]
+            plugins = django_coverage_plugin
+            [report]
+            exclude_lines =
+                noqa: no-cover
+                !SKIP ME!
+            """,
+        )
         tem = get_template(self.template_file)
         self.cov = coverage.Coverage(source=["."])
-        self.append_config("run:plugins", "django_coverage_plugin")
-        # Set the exclude_lines with own patterns.
-        self.cov.config.set_option(
-            "report:exclude_lines",
-            ["noqa: no-cover", "!SKIP ME!"],
-        )
         self.cov.start()
         tem.render({"condition": True, "content": "hi"})
         self.cov.stop()
         self.cov.save()
         self.assert_analysis([1, 5, 7, 9, 10], missing=[7])  # Expecting 1 missing line
+
+    def test_exclude_also(self):
+        """Test that report:exclude_also patterns are picked up."""
+        self.make_template("""\
+            Before
+            {% if condition %}{# custom-exclude #}
+                {{ content }}
+            {% endif %}
+            After
+            """)
+        self.make_file(
+            ".coveragerc",
+            """\
+            [run]
+            plugins = django_coverage_plugin
+            [report]
+            exclude_also = custom-exclude
+            """
+        )
+        tem = get_template(self.template_file)
+        self.cov = coverage.Coverage(source=["."])
+        self.cov.start()
+        tem.render({"condition": True, "content": "hi"})
+        self.cov.stop()
+        self.cov.save()
+        self.assert_analysis([1, 5])
