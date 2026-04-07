@@ -4,6 +4,7 @@
 """Tests for {# pragma: no cover #} support in Django templates."""
 
 import coverage
+import pytest
 from django.template.loader import get_template
 
 from .plugin_test import DjangoPluginTestCase
@@ -116,6 +117,9 @@ class PragmaTest(DjangoPluginTestCase):
         self.cov.save()
         self.assert_analysis([1, 5, 7, 9, 10], missing=[7])  # Expecting 1 missing line
 
+    @pytest.mark.skipif(
+        coverage.version_info < (7, 2), reason="exclude_also requires coverage 7.2+"
+    )
     def test_exclude_also(self):
         """Test that report:exclude_also patterns are picked up."""
         self.make_template("""\
@@ -132,7 +136,7 @@ class PragmaTest(DjangoPluginTestCase):
             plugins = django_coverage_plugin
             [report]
             exclude_also = custom-exclude
-            """
+            """,
         )
         tem = get_template(self.template_file)
         self.cov = coverage.Coverage(source=["."])
