@@ -59,6 +59,30 @@ class PragmaTest(DjangoPluginTestCase):
         )
         self.assert_analysis([1, 7])
 
+    def test_nested_if_blocks(self):
+        """Test that nested block of same type are handled."""
+        self.make_template("""\
+            Before
+            {% if 1 %}{# pragma: no cover #}
+              {% if 0 %}
+                Not covered
+              {% endif %}
+              Also not covered, due to parent block.
+            {% endif %}
+            After
+            """)
+        self.run_django_coverage()
+        self.assert_analysis([1, 8])
+
+    def test_whitespace_around_pragma(self):
+        """Test that whitespace characters are stripped."""
+        self.make_template("""\
+            Before
+            {% load static %}{#        pragma:  no  cover  #}
+            """)
+        self.run_django_coverage()
+        self.assert_analysis([1])
+
     def test_custom_exclude_patterns(self):
         """Test that coverage.py config for report:exclude_lines is used."""
         self.make_template("""\
