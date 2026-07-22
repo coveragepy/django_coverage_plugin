@@ -309,13 +309,16 @@ class FileReporter(coverage.plugin.FileReporter):
                     if extends:
                         continue
 
+                if token.contents == "comment":
+                    # Set this before the extends-skip below: in an inheriting
+                    # template a comment outside the blocks must still suppress
+                    # measurement of its contents (issue #70).
+                    comment = True
+
                 if extends and not inblock:
                     # In an inheriting template, ignore all tags outside of
                     # blocks.
                     continue
-
-                if token.contents == "comment":
-                    comment = True
                 if token.contents.startswith("end"):
                     continue
                 elif token.contents in ("else", "empty"):

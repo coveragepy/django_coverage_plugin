@@ -106,6 +106,31 @@ class BlockTest(DjangoPluginTestCase):
         self.assert_analysis([1, 2, 3], name="base.html")
         self.assert_analysis([1, 4, 8], [8], name="specific.html")
 
+    def test_inheriting_with_comment_outside_blocks(self):
+        # https://github.com/coveragepy/django_coverage_plugin/issues/70
+        # A {% comment %} outside the blocks of an inheriting template was
+        # skipped before the comment flag was set, so {{ vars }} inside the
+        # comment were measured as executable lines that can never run.
+        self.make_template(name="base.html", text="""\
+            Hello
+            {% block second_line %}second{% endblock %}
+            """)
+
+        self.make_template(name="specific.html", text="""\
+            {% extends "base.html" %}
+            {% comment %}
+                {{ this.line.was.reported.missing }}
+            {% endcomment %}
+            {% block second_line %}
+            SECOND
+            {% endblock %}
+            """)
+
+        text = self.run_django_coverage(name="specific.html")
+        self.assertEqual(text, "Hello\n\nSECOND\n\n")
+        self.assert_analysis([1, 2], name="base.html")
+        self.assert_analysis([1, 6], name="specific.html")
+
     def test_empty_parent_block_on_new_line_when_extended(self):
         """
         When a block is empty and extended, endblock should not appear
