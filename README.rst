@@ -107,6 +107,17 @@ If you use ``pyproject.toml`` for tool configuration use::
     [tool.coverage.django_coverage_plugin]
     template_extensions = 'html, txt, tex, email'
 
+You can exclude template lines from coverage with ``{# pragma: no cover #}``.
+On a block tag, it excludes the entire block through its closing tag::
+
+    {% if debug %}{# pragma: no cover #}
+        <div>{{ debug_info }}</div>
+    {% endif %}
+
+On a plain text or variable line, it excludes that line only.  Custom
+``exclude_lines`` patterns from your coverage configuration are supported
+automatically.
+
 Caveats
 ~~~~~~~
 
