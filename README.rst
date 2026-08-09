@@ -171,6 +171,15 @@ History
 
 .. scriv-insert-here
 
+Unreleased
+----------
+
+Comment like ``{# pragma: no cover #}`` now work in Django templates to exclude
+lines from coverage measurement. Thanks, Marc Gibbons (`pull 110`_).
+
+.. _pull 110: https://github.com/coveragepy/django_coverage_plugin/pull/110
+
+
 v3.2.2 — 2026-04-04
 -------------------
 
