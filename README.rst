@@ -78,6 +78,14 @@ your settings file:
         },
     ]
 
+Form template coverage only works when you use the
+:code:`django.forms.renderers.TemplatesSetting` renderer, in addition to the
+setting above:
+
+.. code-block:: python
+
+    FORM_RENDERER = 'django.forms.renderes.TemplatesSetting'
+
 
 Configuration
 ~~~~~~~~~~~~~
